@@ -34,9 +34,9 @@ app.add_middleware(
 async def root():
     return {
         "message": "Crypto Dashboard API",
-        "status": "running",
         "version": "1.0.0",
-        "docs": "/docs"
+        "docs": "/docs",
+        "health": "/health"
     }
 
 @app.get("/health")
