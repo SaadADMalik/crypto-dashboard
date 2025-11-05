@@ -1,32 +1,25 @@
-﻿from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.orm import declarative_base
-from app.config import settings
+﻿from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import declarative_base, sessionmaker
 
-# Create async engine
+# Use aiosqlite for async SQLite
+DATABASE_URL = "sqlite+aiosqlite:///./crypto_dashboard.db"
+
 engine = create_async_engine(
-    settings.DATABASE_URL,
-    echo=True if settings.ENVIRONMENT == "development" else False,
+    DATABASE_URL,
+    echo=True,
+    future=True
 )
 
-# Create async session factory
-AsyncSessionLocal = async_sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
+async_session = sessionmaker(
+    engine, class_=AsyncSession, expire_on_commit=False
 )
 
-# Base class for models
 Base = declarative_base()
 
-# Dependency to get database session
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        try:
-            yield session
-        finally:
-            await session.close()
-
-# Create all tables
 async def create_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+async def get_db():
+    async with async_session() as session:
+        yield session

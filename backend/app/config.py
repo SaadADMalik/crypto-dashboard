@@ -3,7 +3,10 @@ from typing import List
 
 class Settings(BaseSettings):
     # Database
-    DATABASE_URL: str = "sqlite+aiosqlite:///./crypto_dashboard.db"
+    DATABASE_URL = os.getenv(
+    "DATABASE_URL", 
+    "sqlite+aiosqlite:///./crypto_dashboard.db"  # ← Must have +aiosqlite
+)
     
     # API URLs
     COINGECKO_API_URL: str = "https://api.coingecko.com/api/v3"
